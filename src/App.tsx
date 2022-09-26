@@ -1,14 +1,14 @@
 import { Container, Typography, Button } from "@mui/material";
 import "./App.css";
 import NavigationBar from "./components/NavigationBar";
-import OptionsPanel from "./components/OptionsPanel";
+import ControlPanel from "./components/ControlPanel/ControlPanel";
 
 function App() {
   return (
     <>
       <NavigationBar />
       <Container maxWidth="lg">
-        <OptionsPanel />
+        <ControlPanel />
       </Container>
     </>
   );
