@@ -1,10 +1,17 @@
 import { TextField, InputAdornment, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useSimulationContext } from "../../context/SimulationContext";
 
 export default function InputPanel() {
-  const [budgetValue, setBudgetValue] = useState(10000);
-  const [stakeValue, setStakeValue] = useState(50);
-  const [spinTime, setSpinTime] = useState(30);
+  const {
+    budgetValue,
+    setBudgetValue,
+    stakeValue,
+    setStakeValue,
+    spinTime,
+    setSpinTime,
+    simulationRunning,
+  } = useSimulationContext();
 
   useEffect(() => {
     budgetValue < stakeValue ? setBudgetValue(stakeValue) : null;
@@ -37,10 +44,12 @@ export default function InputPanel() {
               : setBudgetValue(stakeValue);
           }}
           inputProps={{
-            step: 1,
+            step: 100,
             min: stakeValue,
           }}
           InputProps={{
+            disabled: simulationRunning,
+            readOnly: simulationRunning,
             startAdornment: (
               <InputAdornment
                 position="start"
@@ -68,6 +77,8 @@ export default function InputPanel() {
             step: 1,
           }}
           InputProps={{
+            disabled: simulationRunning,
+            readOnly: simulationRunning,
             startAdornment: (
               <InputAdornment
                 position="start"
@@ -95,6 +106,8 @@ export default function InputPanel() {
             step: 1,
           }}
           InputProps={{
+            disabled: simulationRunning,
+            readOnly: simulationRunning,
             endAdornment: (
               <InputAdornment
                 position="end"

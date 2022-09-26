@@ -1,13 +1,21 @@
 import { TextField, InputAdornment, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useSimulationContext } from "../../context/SimulationContext";
 export default function OptionsPanel() {
-  const [currentBalance, setCurrentBalance] = useState();
-  const [spinNumber, setSpinNumber] = useState(0);
-  const [currentStake, setCurrentStake] = useState();
-  const [highestStake, setHighestStake] = useState();
-  const [lowestBalance, setLowestBalance] = useState();
-  const [simulationSpeed, setSimulationSpeed] = useState();
-  const [timeStamp, setTimeStamp] = useState();
+  const {
+    currentBalance,
+    setCurrentBalance,
+    spinNumber,
+    setSpinNumber,
+    currentStake,
+    setCurrentStake,
+    highestStake,
+    setHighestStake,
+    lowestBalance,
+    setLowestBalance,
+    timeStamp,
+    setTimeStamp,
+  } = useSimulationContext();
 
   return (
     <Stack>
@@ -31,11 +39,8 @@ export default function OptionsPanel() {
           label="Spin"
           value={spinNumber}
           variant="outlined"
-          onChange={(e) => {}}
-          inputProps={{
-            min: 0,
-          }}
           InputProps={{
+            readOnly: true,
             startAdornment: (
               <InputAdornment
                 position="start"
@@ -55,10 +60,8 @@ export default function OptionsPanel() {
           value={currentBalance}
           variant="outlined"
           onChange={(e) => {}}
-          inputProps={{
-            min: 0,
-          }}
           InputProps={{
+            readOnly: true,
             startAdornment: (
               <InputAdornment
                 position="start"
@@ -77,8 +80,8 @@ export default function OptionsPanel() {
           label="Current stake"
           value={currentStake}
           variant="outlined"
-          onChange={(e) => {}}
           InputProps={{
+            readOnly: true,
             startAdornment: (
               <InputAdornment
                 position="start"
@@ -97,11 +100,8 @@ export default function OptionsPanel() {
           label="Highest stake"
           value={highestStake}
           variant="outlined"
-          onChange={(e) => {}}
-          inputProps={{
-            min: 0,
-          }}
           InputProps={{
+            readOnly: true,
             startAdornment: (
               <InputAdornment
                 position="start"
@@ -121,10 +121,8 @@ export default function OptionsPanel() {
           value={0}
           variant="outlined"
           onChange={(e) => {}}
-          inputProps={{
-            min: 0,
-          }}
           InputProps={{
+            readOnly: true,
             startAdornment: (
               <InputAdornment
                 position="start"
@@ -143,11 +141,8 @@ export default function OptionsPanel() {
           label="Earnings / h"
           value={0}
           variant="outlined"
-          onChange={(e) => {}}
-          inputProps={{
-            min: 0,
-          }}
           InputProps={{
+            readOnly: true,
             startAdornment: (
               <InputAdornment
                 position="start"
@@ -160,7 +155,7 @@ export default function OptionsPanel() {
           }}
         />
       </Stack>
-      <Typography>Time passed: </Typography>
+      <Typography>Playing time: 4 hours, 3 mins, 10 secs </Typography>
     </Stack>
   );
 }
