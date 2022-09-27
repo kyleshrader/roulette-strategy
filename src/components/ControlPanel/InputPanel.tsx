@@ -1,4 +1,14 @@
-import { TextField, InputAdornment, Stack, Typography } from "@mui/material";
+import {
+  TextField,
+  InputAdornment,
+  Stack,
+  Typography,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSimulationContext } from "../../context/SimulationContext";
 
@@ -11,6 +21,8 @@ export default function InputPanel() {
     spinTime,
     setSpinTime,
     simulationRunning,
+    rouletteType,
+    setRouletteType,
   } = useSimulationContext();
 
   useEffect(() => {
@@ -22,8 +34,30 @@ export default function InputPanel() {
       <Typography variant="body1" color="primary">
         Input Panel
       </Typography>
+      <FormControl sx={{ mt: 3, mb: 2 }}>
+        <FormLabel id="rouletteType">Roulette type:</FormLabel>
+        <RadioGroup
+          row
+          aria-labelledby="rouletteType"
+          name="controlled-radio-buttons-group"
+          value={rouletteType}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            setRouletteType((event.target as HTMLInputElement).value);
+          }}
+        >
+          <FormControlLabel
+            value="europeanRoulette"
+            control={<Radio disabled={simulationRunning} />}
+            label="European"
+          />
+          <FormControlLabel
+            value="americanRoulette"
+            control={<Radio disabled={simulationRunning} />}
+            label="American"
+          />
+        </RadioGroup>
+      </FormControl>
       <Stack
-        sx={{ my: 3 }}
         direction="row"
         gap={2}
         flexWrap={{

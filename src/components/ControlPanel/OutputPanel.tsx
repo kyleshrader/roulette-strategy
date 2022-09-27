@@ -1,21 +1,21 @@
 import { TextField, InputAdornment, Stack, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { formatNumber } from "../../utils/numberFormatter";
+import { formatTime } from "../../utils/timeFormatter";
 import { useSimulationContext } from "../../context/SimulationContext";
 export default function OptionsPanel() {
   const {
     currentBalance,
-    setCurrentBalance,
     spinNumber,
-    setSpinNumber,
     currentStake,
-    setCurrentStake,
     highestStake,
-    setHighestStake,
     lowestBalance,
-    setLowestBalance,
-    timeStamp,
-    setTimeStamp,
+    startTimeStamp,
+    budgetValue,
+    simulationRunning,
+    virtualTime,
   } = useSimulationContext();
+
+  const time = formatTime(virtualTime.current);
 
   return (
     <Stack>
@@ -57,7 +57,7 @@ export default function OptionsPanel() {
           type="text"
           id="currentBalance"
           label="Current balance"
-          value={currentBalance}
+          value={formatNumber(currentBalance.current)}
           variant="outlined"
           InputProps={{
             readOnly: true,
@@ -77,7 +77,7 @@ export default function OptionsPanel() {
           type="text"
           id="lowestBalance"
           label="Lowest balance"
-          value={lowestBalance}
+          value={formatNumber(lowestBalance.current)}
           variant="outlined"
           InputProps={{
             readOnly: true,
@@ -97,7 +97,7 @@ export default function OptionsPanel() {
           type="text"
           id="currentStake"
           label="Current stake"
-          value={currentStake}
+          value={formatNumber(currentStake.current)}
           variant="outlined"
           InputProps={{
             readOnly: true,
@@ -117,7 +117,7 @@ export default function OptionsPanel() {
           type="text"
           id="highestStake"
           label="Highest stake"
-          value={highestStake}
+          value={formatNumber(highestStake.current)}
           variant="outlined"
           InputProps={{
             readOnly: true,
@@ -137,9 +137,8 @@ export default function OptionsPanel() {
           type="text"
           id="totalEarnings"
           label="Total earnings"
-          value={0}
+          value={formatNumber(currentBalance.current - budgetValue)}
           variant="outlined"
-          onChange={(e) => {}}
           InputProps={{
             readOnly: true,
             startAdornment: (
@@ -158,7 +157,10 @@ export default function OptionsPanel() {
           type="text"
           id="earningsperh"
           label="Earnings / h"
-          value={0}
+          value={formatNumber(
+            (currentBalance.current - budgetValue) /
+              (virtualTime.current / 3600000)
+          )}
           variant="outlined"
           InputProps={{
             readOnly: true,
@@ -174,7 +176,9 @@ export default function OptionsPanel() {
           }}
         />
       </Stack>
-      <Typography>Playing time: 4 hours, 3 mins, 10 secs </Typography>
+      <Typography>
+        Simulated playing time: {time.h}h {time.m}m {time.s}s
+      </Typography>
     </Stack>
   );
 }

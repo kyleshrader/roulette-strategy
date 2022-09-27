@@ -284,7 +284,7 @@ export const americanRoulette = [
   },
   {
     id: 19,
-    value: "0",
+    value: "00",
     color: "green",
   },
   {

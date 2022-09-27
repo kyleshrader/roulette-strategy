@@ -16,35 +16,36 @@ type SimulationContextTypes = {
   budgetValue: number;
   stakeValue: number;
   spinTime: number;
-  currentBalance: number;
-  spinNumber: number;
-  currentStake: number;
-  highestStake: number;
-  lowestBalance: number;
   simulationSpeed: number;
-  timeStamp: number;
+  rouletteType: string;
+  spinNumber: number;
+  currentBalance: { current: number };
+  currentStake: { current: number };
+  highestStake: { current: number };
+  lowestBalance: { current: number };
+  startTimeStamp: { current: number };
   simulationRunning: boolean;
   simulationMessage: string;
-  intervalId: number;
+  intervalId: { current: number };
+  virtualTime: { current: number };
   setBudgetValue: (value: number) => void;
   setStakeValue: (value: number) => void;
   setSpinTime: (value: number) => void;
-  setCurrentBalance: (value: number) => void;
-  setSpinNumber: (value: number) => void;
-  setCurrentStake: (value: number) => void;
-  setHighestStake: (value: number) => void;
-  setLowestBalance: (value: number) => void;
   setSimulationSpeed: (value: number) => void;
-  setTimeStamp: (value: number) => void;
+  setRouletteType: (value: string) => void;
+  setSpinNumber: (value: number) => void;
   setSimulationRunning: (value: boolean) => void;
   startSimulation: () => void;
   stopSimulation: () => void;
   runSimulation: () => void;
   setSimulationMessage: (value: string) => void;
-  setIntervalId: (value: number) => void;
 };
 
 const SimulationContext = createContext({} as SimulationContextTypes);
+
+const getRandomInteger = (min: number, max: number) => {
+  return Math.floor(Math.random() * (max - min)) + min;
+};
 
 export const useSimulationContext = () => {
   return useContext(SimulationContext);
@@ -52,61 +53,79 @@ export const useSimulationContext = () => {
 
 export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   // INPUT VALUES
-  const [budgetValue, setBudgetValue] = useState(150);
+  const [budgetValue, setBudgetValue] = useState(1500);
   const [stakeValue, setStakeValue] = useState(50);
   const [spinTime, setSpinTime] = useState(30);
   const [simulationSpeed, setSimulationSpeed] = useState(1000);
+  const [rouletteType, setRouletteType] = useState("europeanRoulette");
+
   // OUTPUT VALUES
-  const [currentBalance, setCurrentBalance] = useState(0);
   const [spinNumber, setSpinNumber] = useState(0);
-  const [currentStake, setCurrentStake] = useState(0);
-  const [highestStake, setHighestStake] = useState(0);
-  const [lowestBalance, setLowestBalance] = useState(0);
-  const [timeStamp, setTimeStamp] = useState(0);
+  const currentBalance = useRef(0);
+  const currentStake = useRef(0);
+  const highestStake = useRef(0);
+  const lowestBalance = useRef(0);
+  const startTimeStamp = useRef(Date.now());
+  const virtualTime = useRef(0);
   const [simulationRunning, setSimulationRunning] = useState(false);
   const [simulationMessage, setSimulationMessage] = useState("");
 
   // HELPERS
-  const [intervalId, setIntervalId] = useState(0);
-  const rendersNumber = useRef(1);
+  const bettingOn = useRef("black");
+  const intervalId = useRef(0);
 
   useEffect(() => {
     if (simulationRunning) {
-      const newIntervalId = setInterval(runSimulation, simulationSpeed); //get new interval ID
-      setIntervalId(newIntervalId); // save interval ID for clearing purposes
+      intervalId.current = setInterval(runSimulation, simulationSpeed); // get and save new interval ID
     }
-    return () => clearInterval(intervalId);
+    return () => {
+      if (simulationRunning) {
+        clearInterval(intervalId.current); // clear outdated interval on dismount
+      }
+    };
   }, [simulationRunning, simulationSpeed]);
 
-  useEffect(() => {
-    console.log(rendersNumber.current);
-    rendersNumber.current++;
-  });
-
   const runSimulation = () => {
-    if (currentBalance < currentStake) {
-      setSimulationMessage("Bankrupt");
+    const roulette =
+      rouletteType === "europeanRoulette" ? europeanRoulette : americanRoulette;
+    if (currentBalance.current < lowestBalance.current)
+      lowestBalance.current = currentBalance.current;
+    if (currentStake.current > highestStake.current)
+      highestStake.current = currentStake.current;
+    // losing condition
+    if (currentBalance.current - currentStake.current < 0) {
+      setSimulationMessage("You've run out of money...");
       stopSimulation();
       return;
-    } else {
-      setSpinNumber((prevSpinNumber) => prevSpinNumber + 1);
-      setCurrentBalance(
-        (prevCurrentBalance) => prevCurrentBalance - currentStake
-      );
+    }
+    // gameplay
+    setSpinNumber((prevSpinNumber) => prevSpinNumber + 1);
+    virtualTime.current += spinTime * 1000;
+    const randomizedNumber = getRandomInteger(0, roulette.length);
+    // won spin
+    if (bettingOn.current === roulette[randomizedNumber].color) {
+      currentBalance.current += currentStake.current;
+      currentStake.current = stakeValue;
+    }
+    // lost spin
+    if (bettingOn.current !== roulette[randomizedNumber].color) {
+      currentBalance.current -= currentStake.current;
+      currentStake.current = currentStake.current * 2;
     }
   };
 
   const startSimulation = () => {
     setSimulationRunning(true);
     setSpinNumber(0);
-    setCurrentBalance(budgetValue);
-    setCurrentStake(stakeValue);
-    setHighestStake(stakeValue);
-    setLowestBalance(budgetValue);
+    virtualTime.current = 0;
+    currentBalance.current = budgetValue;
+    currentStake.current = stakeValue;
+    highestStake.current = stakeValue;
+    lowestBalance.current = budgetValue;
   };
 
   const stopSimulation = () => {
-    clearInterval(intervalId);
+    clearInterval(intervalId.current);
     setSimulationRunning(false);
     return;
   };
@@ -121,19 +140,14 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
         spinTime,
         setSpinTime,
         currentBalance,
-        setCurrentBalance,
         spinNumber,
         setSpinNumber,
         currentStake,
-        setCurrentStake,
         highestStake,
-        setHighestStake,
         lowestBalance,
-        setLowestBalance,
         simulationSpeed,
         setSimulationSpeed,
-        timeStamp,
-        setTimeStamp,
+        startTimeStamp,
         simulationRunning,
         setSimulationRunning,
         startSimulation,
@@ -142,7 +156,9 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
         simulationMessage,
         setSimulationMessage,
         intervalId,
-        setIntervalId,
+        rouletteType,
+        setRouletteType,
+        virtualTime,
       }}
     >
       {children}
