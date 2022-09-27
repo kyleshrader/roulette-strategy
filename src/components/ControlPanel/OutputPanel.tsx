@@ -59,7 +59,26 @@ export default function OptionsPanel() {
           label="Current balance"
           value={currentBalance}
           variant="outlined"
-          onChange={(e) => {}}
+          InputProps={{
+            readOnly: true,
+            startAdornment: (
+              <InputAdornment
+                position="start"
+                disablePointerEvents
+                disableTypography
+              >
+                $
+              </InputAdornment>
+            ),
+          }}
+        />
+        <TextField
+          sx={{ maxWidth: "15rem", minWidth: "8rem" }}
+          type="text"
+          id="lowestBalance"
+          label="Lowest balance"
+          value={lowestBalance}
+          variant="outlined"
           InputProps={{
             readOnly: true,
             startAdornment: (
