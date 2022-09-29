@@ -20,6 +20,7 @@ type SimulationContextTypes = {
   rouletteType: string;
   spinNumber: number;
   strategy: string;
+  losingStreak: number;
   currentBalance: { current: number };
   currentStake: { current: number };
   highestStake: { current: number };
@@ -27,11 +28,9 @@ type SimulationContextTypes = {
   startTimeStamp: { current: number };
   simulationRunning: boolean;
   simulationMessage: string;
-  intervalId: { current: number };
+  intervalId: number;
   virtualTime: { current: number };
-  losingStreak: { current: number };
   highestLosingStreak: { current: number };
-
   setBudgetValue: (value: number) => void;
   setStakeValue: (value: number) => void;
   setSpinTime: (value: number) => void;
@@ -73,22 +72,22 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   const lowestBalance = useRef(0);
   const startTimeStamp = useRef(Date.now());
   const virtualTime = useRef(0);
-  const losingStreak = useRef(0);
   const highestLosingStreak = useRef(0);
   const [simulationRunning, setSimulationRunning] = useState(false);
   const [simulationMessage, setSimulationMessage] = useState("");
 
   // HELPERS
+  let losingStreak = 0;
   const bettingOn = useRef("black");
-  const intervalId = useRef(0);
+  let intervalId = 0;
 
   useEffect(() => {
     if (simulationRunning) {
-      intervalId.current = setInterval(runSimulation, simulationSpeed); // get and save new interval ID
+      intervalId = setInterval(runSimulation, simulationSpeed); // get and save new interval ID
     }
     return () => {
       if (simulationRunning) {
-        clearInterval(intervalId.current); // clear outdated interval on dismount
+        clearInterval(intervalId); // clear outdated interval on dismount
       }
     };
   }, [simulationRunning, simulationSpeed]);
@@ -111,15 +110,15 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
     if (bettingOn.current === roulette[randomizedNumber].color) {
       currentBalance.current += currentStake.current;
       currentStake.current = stakeValue;
-      losingStreak.current = 0;
+      losingStreak = 0;
     }
     // lost spin
     if (bettingOn.current !== roulette[randomizedNumber].color) {
       currentBalance.current -= currentStake.current;
       currentStake.current = currentStake.current * 2;
-      losingStreak.current++;
-      if (losingStreak.current > highestLosingStreak.current)
-        highestLosingStreak.current = losingStreak.current;
+      losingStreak++;
+      if (losingStreak > highestLosingStreak.current)
+        highestLosingStreak.current = losingStreak;
       if (currentStake.current > highestStake.current)
         highestStake.current = currentStake.current;
       if (currentBalance.current < lowestBalance.current)
@@ -132,7 +131,7 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
     setSpinNumber(0);
     virtualTime.current = 0;
     highestLosingStreak.current = 0;
-    losingStreak.current = 0;
+    losingStreak = 0;
     currentBalance.current = budgetValue;
     currentStake.current = stakeValue;
     highestStake.current = stakeValue;
@@ -140,7 +139,7 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   };
 
   const stopSimulation = () => {
-    clearInterval(intervalId.current);
+    clearInterval(intervalId);
     setSimulationRunning(false);
     return;
   };
@@ -170,11 +169,11 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
         runSimulation,
         simulationMessage,
         setSimulationMessage,
-        intervalId,
         rouletteType,
         setRouletteType,
         virtualTime,
         losingStreak,
+        intervalId,
         highestLosingStreak,
         strategy,
         setStrategy,
