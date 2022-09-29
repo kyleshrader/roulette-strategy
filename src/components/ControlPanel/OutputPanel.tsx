@@ -9,10 +9,9 @@ export default function OptionsPanel() {
     currentStake,
     highestStake,
     lowestBalance,
-    startTimeStamp,
     budgetValue,
-    simulationRunning,
     virtualTime,
+    highestLosingStreak,
   } = useSimulationContext();
 
   const time = formatTime(virtualTime.current);
@@ -116,7 +115,7 @@ export default function OptionsPanel() {
           sx={{ maxWidth: "10rem" }}
           type="text"
           id="highestStake"
-          label="Highest stake"
+          label="Highest stake / Losing streak"
           value={formatNumber(highestStake.current)}
           variant="outlined"
           InputProps={{
@@ -128,6 +127,15 @@ export default function OptionsPanel() {
                 disableTypography
               >
                 $
+              </InputAdornment>
+            ),
+            endAdornment: (
+              <InputAdornment
+                position="end"
+                disablePointerEvents
+                disableTypography
+              >
+                {highestLosingStreak.current}
               </InputAdornment>
             ),
           }}

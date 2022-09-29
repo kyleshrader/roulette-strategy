@@ -19,6 +19,7 @@ type SimulationContextTypes = {
   simulationSpeed: number;
   rouletteType: string;
   spinNumber: number;
+  strategy: string;
   currentBalance: { current: number };
   currentStake: { current: number };
   highestStake: { current: number };
@@ -28,10 +29,14 @@ type SimulationContextTypes = {
   simulationMessage: string;
   intervalId: { current: number };
   virtualTime: { current: number };
+  losingStreak: { current: number };
+  highestLosingStreak: { current: number };
+
   setBudgetValue: (value: number) => void;
   setStakeValue: (value: number) => void;
   setSpinTime: (value: number) => void;
   setSimulationSpeed: (value: number) => void;
+  setStrategy: (value: string) => void;
   setRouletteType: (value: string) => void;
   setSpinNumber: (value: number) => void;
   setSimulationRunning: (value: boolean) => void;
@@ -56,8 +61,9 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   const [budgetValue, setBudgetValue] = useState(1500);
   const [stakeValue, setStakeValue] = useState(50);
   const [spinTime, setSpinTime] = useState(30);
-  const [simulationSpeed, setSimulationSpeed] = useState(1000);
+  const [simulationSpeed, setSimulationSpeed] = useState(400);
   const [rouletteType, setRouletteType] = useState("europeanRoulette");
+  const [strategy, setStrategy] = useState("martingale");
 
   // OUTPUT VALUES
   const [spinNumber, setSpinNumber] = useState(0);
@@ -67,6 +73,8 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   const lowestBalance = useRef(0);
   const startTimeStamp = useRef(Date.now());
   const virtualTime = useRef(0);
+  const losingStreak = useRef(0);
+  const highestLosingStreak = useRef(0);
   const [simulationRunning, setSimulationRunning] = useState(false);
   const [simulationMessage, setSimulationMessage] = useState("");
 
@@ -88,10 +96,7 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   const runSimulation = () => {
     const roulette =
       rouletteType === "europeanRoulette" ? europeanRoulette : americanRoulette;
-    if (currentBalance.current < lowestBalance.current)
-      lowestBalance.current = currentBalance.current;
-    if (currentStake.current > highestStake.current)
-      highestStake.current = currentStake.current;
+
     // losing condition
     if (currentBalance.current - currentStake.current < 0) {
       setSimulationMessage("You've run out of money...");
@@ -100,17 +105,25 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
     }
     // gameplay
     setSpinNumber((prevSpinNumber) => prevSpinNumber + 1);
-    virtualTime.current += spinTime * 1000;
+    virtualTime.current += spinTime * 1000; // in ms
     const randomizedNumber = getRandomInteger(0, roulette.length);
     // won spin
     if (bettingOn.current === roulette[randomizedNumber].color) {
       currentBalance.current += currentStake.current;
       currentStake.current = stakeValue;
+      losingStreak.current = 0;
     }
     // lost spin
     if (bettingOn.current !== roulette[randomizedNumber].color) {
       currentBalance.current -= currentStake.current;
       currentStake.current = currentStake.current * 2;
+      losingStreak.current++;
+      if (losingStreak.current > highestLosingStreak.current)
+        highestLosingStreak.current = losingStreak.current;
+      if (currentStake.current > highestStake.current)
+        highestStake.current = currentStake.current;
+      if (currentBalance.current < lowestBalance.current)
+        lowestBalance.current = currentBalance.current;
     }
   };
 
@@ -118,6 +131,8 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
     setSimulationRunning(true);
     setSpinNumber(0);
     virtualTime.current = 0;
+    highestLosingStreak.current = 0;
+    losingStreak.current = 0;
     currentBalance.current = budgetValue;
     currentStake.current = stakeValue;
     highestStake.current = stakeValue;
@@ -159,6 +174,10 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
         rouletteType,
         setRouletteType,
         virtualTime,
+        losingStreak,
+        highestLosingStreak,
+        strategy,
+        setStrategy,
       }}
     >
       {children}

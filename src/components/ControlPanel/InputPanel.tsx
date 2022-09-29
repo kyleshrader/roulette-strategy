@@ -8,8 +8,12 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Tooltip,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSimulationContext } from "../../context/SimulationContext";
 
 export default function InputPanel() {
@@ -23,6 +27,8 @@ export default function InputPanel() {
     simulationRunning,
     rouletteType,
     setRouletteType,
+    strategy,
+    setStrategy,
   } = useSimulationContext();
 
   useEffect(() => {
@@ -35,6 +41,22 @@ export default function InputPanel() {
         Input Panel
       </Typography>
       <FormControl sx={{ mt: 3, mb: 2 }}>
+        <InputLabel id="strategySelectLabel">Strategy</InputLabel>
+        <Select
+          disabled={simulationRunning}
+          labelId="strategySelectLabel"
+          id="strategySelect"
+          value={strategy}
+          onChange={(event) => {
+            setStrategy(event.target.value);
+          }}
+          label="Strategy"
+        >
+          <MenuItem value="martingale">Martingale Strategy</MenuItem>
+          <MenuItem value="labouchere">Labouchere System</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl sx={{ mb: 2 }}>
         <FormLabel id="rouletteType">Roulette type:</FormLabel>
         <RadioGroup
           row
@@ -45,16 +67,20 @@ export default function InputPanel() {
             setRouletteType((event.target as HTMLInputElement).value);
           }}
         >
-          <FormControlLabel
-            value="europeanRoulette"
-            control={<Radio disabled={simulationRunning} />}
-            label="European"
-          />
-          <FormControlLabel
-            value="americanRoulette"
-            control={<Radio disabled={simulationRunning} />}
-            label="American"
-          />
+          <Tooltip title="Single 0" placement="left" enterDelay={400} arrow>
+            <FormControlLabel
+              value="europeanRoulette"
+              control={<Radio disabled={simulationRunning} />}
+              label="European"
+            />
+          </Tooltip>
+          <Tooltip title="Double 0" placement="right" enterDelay={400} arrow>
+            <FormControlLabel
+              value="americanRoulette"
+              control={<Radio disabled={simulationRunning} />}
+              label="American"
+            />
+          </Tooltip>
         </RadioGroup>
       </FormControl>
       <Stack
