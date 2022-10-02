@@ -4,6 +4,7 @@ import { formatTime } from "../../utils/timeFormatter";
 import { useSimulationContext } from "../../context/SimulationContext";
 export default function OptionsPanel() {
   const {
+    simulationRunning,
     currentBalance,
     spinNumber,
     currentStake,
@@ -145,7 +146,11 @@ export default function OptionsPanel() {
           type="text"
           id="totalEarnings"
           label="Total earnings"
-          value={formatNumber(currentBalance.current - budgetValue)}
+          value={
+            spinNumber != 0
+              ? formatNumber(currentBalance.current - budgetValue)
+              : ""
+          }
           variant="outlined"
           InputProps={{
             readOnly: true,

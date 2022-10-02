@@ -1,7 +1,16 @@
-import { Button, Stack, Slider, Box, Typography } from "@mui/material";
+import {
+  Button,
+  Stack,
+  Slider,
+  Box,
+  Typography,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
 import { useSimulationContext } from "../../context/SimulationContext";
+import { useState } from "react";
 
 export default function ControlButtons() {
   const {
@@ -10,14 +19,25 @@ export default function ControlButtons() {
     setSimulationSpeed,
     startSimulation,
     stopSimulation,
+    targetSequenceDiff,
+    strategy,
   } = useSimulationContext();
+
+  const [openAlert, setOpenAlert] = useState(false);
+
+  const handleStart = () => {
+    if (targetSequenceDiff === 0 || strategy !== "labouchere")
+      startSimulation();
+    else setOpenAlert(true);
+  };
+
   return (
     <Box sx={{ maxWidth: "40rem" }}>
       <Stack direction="row" gap={1}>
         <Button
           variant="contained"
           color="primary"
-          onClick={startSimulation}
+          onClick={handleStart}
           disabled={simulationRunning}
         >
           <PlayCircleIcon sx={{ mr: 1 }} />
@@ -33,6 +53,15 @@ export default function ControlButtons() {
           STOP
         </Button>
       </Stack>
+      <Snackbar
+        open={openAlert}
+        autoHideDuration={3000}
+        onClose={() => setOpenAlert(false)}
+      >
+        <Alert severity="error">
+          Betting sequence values must add up to winning target
+        </Alert>
+      </Snackbar>
       <Box sx={{ mt: 2 }} textAlign="center">
         <Typography variant="body1" id="simulationSpeed">
           Simulation speed

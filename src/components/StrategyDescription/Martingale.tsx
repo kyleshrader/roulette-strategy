@@ -48,31 +48,26 @@ export default function Martingale() {
           </Typography>
           <Typography variant="body1">
             <b>How to use this strategy in roulette?</b>
-            <br />
-            <ol>
-              <li>Choose the color you want to bet on.</li>
-              <li>
-                You won? Good, keep betting on the same color with base stake.
-              </li>
-              <li>
-                You lost? Well, double your previous stake and bet on chosen
-                color.
-              </li>
-            </ol>
           </Typography>
+          <ol>
+            <li>Choose the color you want to bet on.</li>
+            <li>
+              You won? Good, keep betting on the same color with base stake.
+            </li>
+            <li>
+              You lost? Well, double your previous stake and bet on chosen
+              color.
+            </li>
+          </ol>
           <Typography variant="body1" color="primary">
             Read more: <br />
-            <Typography color="black">
-              <a href=" https://en.wikipedia.org/wiki/Martingale_(betting_system)">
-                wikipedia.org
-              </a>
-            </Typography>
-            <Typography color="black">
-              <a href=" https://www.roulettesites.org/strategies/martingale/">
-                roulettesites.org
-              </a>
-            </Typography>
           </Typography>
+          <a href=" https://en.wikipedia.org/wiki/Martingale_(betting_system)">
+            wikipedia.org
+          </a>
+          <a href=" https://www.roulettesites.org/strategies/martingale/">
+            roulettesites.org
+          </a>
         </Stack>
       </AccordionDetails>
     </Accordion>

@@ -13,6 +13,7 @@ type SimulationProviderProps = {
 };
 
 type SimulationContextTypes = {
+  //INPUT
   budgetValue: number;
   stakeValue: number;
   spinTime: number;
@@ -21,6 +22,10 @@ type SimulationContextTypes = {
   spinNumber: number;
   strategy: string;
   losingStreak: number;
+  winningTarget: number;
+  sequence: { current: number[] };
+  initialSequence: { current: number[] };
+  //OUTPUT
   currentBalance: { current: number };
   currentStake: { current: number };
   highestStake: { current: number };
@@ -31,12 +36,17 @@ type SimulationContextTypes = {
   intervalId: number;
   virtualTime: { current: number };
   highestLosingStreak: { current: number };
+  targetSequenceDiff: number;
+  //INPUT
   setBudgetValue: (value: number) => void;
   setStakeValue: (value: number) => void;
   setSpinTime: (value: number) => void;
+  setWinningTarget: (value: number) => void;
   setSimulationSpeed: (value: number) => void;
   setStrategy: (value: string) => void;
   setRouletteType: (value: string) => void;
+  setTargetSequenceDiff: (value: number) => void;
+  //OUTPUT
   setSpinNumber: (value: number) => void;
   setSimulationRunning: (value: boolean) => void;
   startSimulation: () => void;
@@ -61,8 +71,10 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   const [stakeValue, setStakeValue] = useState(50);
   const [spinTime, setSpinTime] = useState(30);
   const [simulationSpeed, setSimulationSpeed] = useState(400);
+  const [winningTarget, setWinningTarget] = useState(100);
   const [rouletteType, setRouletteType] = useState("europeanRoulette");
-  const [strategy, setStrategy] = useState("martingale");
+  const [strategy, setStrategy] = useState<string>("labouchere");
+  const sequence = useRef<number[]>([]);
 
   // OUTPUT VALUES
   const [spinNumber, setSpinNumber] = useState(0);
@@ -77,9 +89,12 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   const [simulationMessage, setSimulationMessage] = useState("");
 
   // HELPERS
-  let losingStreak = 0;
+  const initialSequence = useRef<number[]>([]);
+  let losingStreak: number = 0;
+  let intervalId: number = 0;
   const bettingOn = useRef("black");
-  let intervalId = 0;
+
+  const [targetSequenceDiff, setTargetSequenceDiff] = useState(0);
 
   useEffect(() => {
     if (simulationRunning) {
@@ -106,23 +121,66 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
     setSpinNumber((prevSpinNumber) => prevSpinNumber + 1);
     virtualTime.current += spinTime * 1000; // in ms
     const randomizedNumber = getRandomInteger(0, roulette.length);
-    // won spin
-    if (bettingOn.current === roulette[randomizedNumber].color) {
-      currentBalance.current += currentStake.current;
-      currentStake.current = stakeValue;
-      losingStreak = 0;
-    }
-    // lost spin
-    if (bettingOn.current !== roulette[randomizedNumber].color) {
-      currentBalance.current -= currentStake.current;
-      currentStake.current = currentStake.current * 2;
-      losingStreak++;
-      if (losingStreak > highestLosingStreak.current)
-        highestLosingStreak.current = losingStreak;
-      if (currentStake.current > highestStake.current)
-        highestStake.current = currentStake.current;
-      if (currentBalance.current < lowestBalance.current)
-        lowestBalance.current = currentBalance.current;
+    switch (strategy) {
+      case "martingale":
+        // won spin
+        if (bettingOn.current === roulette[randomizedNumber].color) {
+          losingStreak = 0;
+          currentBalance.current += currentStake.current;
+          currentStake.current = stakeValue;
+        }
+        // lost spin
+        if (bettingOn.current !== roulette[randomizedNumber].color) {
+          losingStreak++;
+          currentBalance.current -= currentStake.current;
+          currentStake.current = currentStake.current * 2;
+
+          if (losingStreak > highestLosingStreak.current)
+            highestLosingStreak.current = losingStreak;
+          if (currentStake.current > highestStake.current)
+            highestStake.current = currentStake.current;
+          if (currentBalance.current < lowestBalance.current)
+            lowestBalance.current = currentBalance.current;
+        }
+        break;
+      case "labouchere":
+        // won spin
+        if (bettingOn.current === roulette[randomizedNumber].color) {
+          losingStreak = 0;
+          currentBalance.current += currentStake.current; //add stake to balance
+          sequence.current.shift(); // remove first element
+          sequence.current.pop(); // remove last element
+
+          //winning target accomplished, sequence list is empty
+          if (sequence.current.length === 0) {
+            setSimulationMessage("You have reached your target!");
+            stopSimulation();
+            return;
+          }
+          if (sequence.current.length === 1)
+            currentStake.current = sequence.current[0];
+          else
+            currentStake.current =
+              sequence.current[0] +
+              sequence.current[sequence.current.length - 1];
+        }
+        // lost spin
+        if (bettingOn.current !== roulette[randomizedNumber].color) {
+          losingStreak++;
+          currentBalance.current -= currentStake.current;
+          sequence.current.push(currentStake.current);
+          currentStake.current =
+            sequence.current[0] + sequence.current[sequence.current.length - 1];
+          if (losingStreak > highestLosingStreak.current)
+            highestLosingStreak.current = losingStreak;
+          if (currentStake.current > highestStake.current)
+            highestStake.current = currentStake.current;
+          if (currentBalance.current < lowestBalance.current)
+            lowestBalance.current = currentBalance.current;
+        }
+        break;
+      default:
+        throw new Error("Strategy not recognized.");
     }
   };
 
@@ -134,11 +192,20 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
     losingStreak = 0;
     currentBalance.current = budgetValue;
     currentStake.current = stakeValue;
-    highestStake.current = stakeValue;
+    if (strategy === "labouchere") {
+      initialSequence.current = Array.from(sequence.current); //copying initial sequence
+      if (sequence.current.length === 1)
+        currentStake.current = sequence.current[0];
+      else
+        currentStake.current =
+          sequence.current[0] + sequence.current[sequence.current.length - 1];
+    }
+    highestStake.current = currentStake.current;
     lowestBalance.current = budgetValue;
   };
 
   const stopSimulation = () => {
+    sequence.current = Array.from(initialSequence.current); //returning to initial sequence
     clearInterval(intervalId);
     setSimulationRunning(false);
     return;
@@ -177,6 +244,12 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
         highestLosingStreak,
         strategy,
         setStrategy,
+        winningTarget,
+        setWinningTarget,
+        sequence,
+        targetSequenceDiff,
+        setTargetSequenceDiff,
+        initialSequence,
       }}
     >
       {children}

@@ -65,35 +65,30 @@ export default function Labouchere() {
           </Typography>
           <Typography variant="body1">
             <b>How to use this strategy in roulette?</b>
-            <br />
-            <ol>
-              <li>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Praesentium, quod!
-              </li>
-              <li>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Praesentium, quod!
-              </li>
-              <li>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Praesentium, quod!.
-              </li>
-            </ol>
           </Typography>
+          <ol>
+            <li>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Praesentium, quod!
+            </li>
+            <li>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Praesentium, quod!
+            </li>
+            <li>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Praesentium, quod!.
+            </li>
+          </ol>
           <Typography variant="body1" color="primary">
-            Read more: <br />
-            <Typography color="black">
-              <a href="https://en.wikipedia.org/wiki/Labouch%C3%A8re_system">
-                wikipedia.org
-              </a>
-            </Typography>
-            <Typography color="black">
-              <a href="https://www.roulettesites.org/strategies/labouchere/">
-                roulettesites.org
-              </a>
-            </Typography>
+            Read more:
           </Typography>
+          <a href="https://en.wikipedia.org/wiki/Labouch%C3%A8re_system">
+            wikipedia.org
+          </a>
+          <a href="https://www.roulettesites.org/strategies/labouchere/">
+            roulettesites.org
+          </a>
         </Stack>
       </AccordionDetails>
     </Accordion>

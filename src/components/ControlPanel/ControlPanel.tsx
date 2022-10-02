@@ -1,5 +1,5 @@
 import { Paper, Stack, Box } from "@mui/material";
-import InputPanel from "./InputPanel";
+import InputPanel from "./InputComponents/InputPanel";
 import OutputPanel from "./OutputPanel";
 import ControlButtons from "./ControlButtons";
 
