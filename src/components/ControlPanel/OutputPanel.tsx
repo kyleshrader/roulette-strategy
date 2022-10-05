@@ -1,10 +1,16 @@
-import { TextField, InputAdornment, Stack, Typography } from "@mui/material";
+import {
+  TextField,
+  InputAdornment,
+  Stack,
+  Typography,
+  Box,
+} from "@mui/material";
 import { formatNumber } from "../../utils/numberFormatter";
 import { formatTime } from "../../utils/timeFormatter";
 import { useSimulationContext } from "../../context/SimulationContext";
 export default function OptionsPanel() {
   const {
-    simulationRunning,
+    simulationMessage,
     currentBalance,
     spinNumber,
     currentStake,
@@ -13,6 +19,7 @@ export default function OptionsPanel() {
     budgetValue,
     virtualTime,
     highestLosingStreak,
+    displayDrawnNumber,
   } = useSimulationContext();
 
   const time = formatTime(virtualTime.current);
@@ -189,9 +196,35 @@ export default function OptionsPanel() {
           }}
         />
       </Stack>
-      <Typography>
-        Simulated playing time: {time.h}h {time.m}m {time.s}s
-      </Typography>
+      <Stack justifyContent="center">
+        <Typography>
+          Simulated playing time: {time.h}h {time.m}m {time.s}s
+        </Typography>
+        <Typography sx={{ mt: 3 }} variant="h6">
+          {spinNumber >= 1 ? simulationMessage.result : ""}
+        </Typography>
+        <Typography variant="body1">
+          Betting on: {simulationMessage.bettingOn}
+        </Typography>
+        {spinNumber >= 1 ? (
+          <Box
+            sx={{
+              p: 3,
+              backgroundColor: displayDrawnNumber.current.color,
+              maxWidth: "3rem",
+              textJustify: "center",
+              textAlign: "center",
+            }}
+            color="white"
+          >
+            <Typography variant="h6">
+              {displayDrawnNumber.current.value}
+            </Typography>
+          </Box>
+        ) : (
+          ""
+        )}
+      </Stack>
     </Stack>
   );
 }

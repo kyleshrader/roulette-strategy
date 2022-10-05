@@ -68,16 +68,32 @@ export default function Labouchere() {
           </Typography>
           <ol>
             <li>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Praesentium, quod!
+              Decide how much you would like to win. Let's say it will be 100$
             </li>
             <li>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Praesentium, quod!
+              Split your target into series of numbers that add up to your
+              target. For our case it will be "10, 20, 30, 40". I will call it a
+              sequence.
             </li>
             <li>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Praesentium, quod!.
+              Bet on the chosen color with stake that is always equal to sum of
+              first and last number in your sequence. First bet will be: 10 + 40
+              = 50
+            </li>
+            <li>
+              If you win, cross out the two numbers that made up your stake.
+              Next bet will be now: 20 + 30 = 50
+            </li>
+            <li>
+              If you lose, add your last stake at the end of the sequence. If we
+              lose, our sequence will look like that: "10, 20, 30, 40, 50". Next
+              stake will again be sum of the first and last number in sequence
+              (10 + 50 = 60)
+            </li>
+            <li>
+              Repeat 3rd and 4th step until you've crossed out every number in
+              sequence (it will mean that you have accomplished your target)
+              ...or until you've run out of money!
             </li>
           </ol>
           <Typography variant="body1" color="primary">
