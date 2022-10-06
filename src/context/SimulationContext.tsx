@@ -12,10 +12,11 @@ type SimulationProviderProps = {
   children: ReactNode;
 };
 
-type DrawnNumber = {
-  id: number;
-  color: string;
-  value: string;
+type DataRow = {
+  spin: number;
+  balance: number;
+  lowestBalance: number;
+  stake: number;
 };
 
 type SimulationContextTypes = {
@@ -53,6 +54,8 @@ type SimulationContextTypes = {
       value: string;
     };
   };
+  historyData: DataRow[] | null;
+
   //INPUT
   setBudgetValue: (value: number) => void;
   setStakeValue: (value: number) => void;
@@ -69,6 +72,7 @@ type SimulationContextTypes = {
   stopSimulation: () => void;
   runSimulation: () => void;
   setSimulationMessage: (value: { result: string; bettingOn: string }) => void;
+  setHistoryData: (value: DataRow[]) => void;
 };
 
 const SimulationContext = createContext({} as SimulationContextTypes);
@@ -108,6 +112,7 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
     bettingOn: bettingOn.current,
   });
   const displayDrawnNumber = useRef({ id: 0, color: "green", value: "0" });
+  const [historyData, setHistoryData] = useState<DataRow[] | null>(null);
 
   // HELPERS
   const initialSequence = useRef<number[]>([]);
@@ -128,6 +133,15 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   }, [simulationRunning, simulationSpeed]);
 
   const runSimulation = () => {
+    setHistoryData((prevData) => [
+      ...prevData!,
+      {
+        spin: prevData!.length || 0,
+        balance: currentBalance.current,
+        lowestBalance: lowestBalance.current,
+        stake: currentStake.current,
+      },
+    ]);
     const roulette =
       rouletteType === "europeanRoulette" ? europeanRoulette : americanRoulette;
 
@@ -225,6 +239,7 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   const startSimulation = () => {
     setSimulationRunning(true);
     setSpinNumber(0);
+    setHistoryData([]);
     setSimulationMessage({
       ...simulationMessage,
       result: "Starting up",
@@ -293,6 +308,8 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
         setTargetSequenceDiff,
         initialSequence,
         displayDrawnNumber,
+        historyData,
+        setHistoryData,
       }}
     >
       {children}
