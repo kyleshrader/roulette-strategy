@@ -32,7 +32,7 @@ export default function History() {
         <AccordionDetails>
           <Stack gap={2} justifyContent="center" alignItems="center">
             <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 650 }} aria-label="history-table">
+              <Table size="small" aria-label="history-table">
                 <TableHead>
                   <TableRow>
                     <TableCell align="center">Spin #</TableCell>
