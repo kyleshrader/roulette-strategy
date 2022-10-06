@@ -16,7 +16,7 @@ export default function Graph() {
       <ResponsiveContainer width="80%" height={300}>
         <LineChart data={historyData!}>
           <Line
-            animationDuration={1000}
+            animationDuration={3000}
             type="natural"
             dataKey="balance"
             stroke="#8884d8"
