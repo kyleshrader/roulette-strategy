@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useSimulationContext } from "../../context/SimulationContext";
+import { formatNumber } from "../../utils/numberFormatter";
 
 export default function HistoryTable() {
   const { historyData, budgetValue } = useSimulationContext();
@@ -19,20 +20,34 @@ export default function HistoryTable() {
         <TableHead>
           <TableRow>
             <TableCell align="center">Spin #</TableCell>
+            <TableCell />
             <TableCell align="center">Balance</TableCell>
             <TableCell align="center">Lowest balance</TableCell>
-            <TableCell align="center">Stake</TableCell>
+            <TableCell align="center">Next stake</TableCell>
             <TableCell align="center">Earnings</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {historyData?.map((data) => (
+          {historyData?.map((data, index) => (
             <TableRow key={data.spin}>
-              <TableCell align="center">{data.spin}</TableCell>
-              <TableCell align="center">{data.balance}</TableCell>
-              <TableCell align="center">{data.lowestBalance}</TableCell>
-              <TableCell align="center">{data.stake}</TableCell>
-              <TableCell align="center">{data.balance - budgetValue}</TableCell>
+              <TableCell align="center">{formatNumber(data.spin)}</TableCell>
+              <TableCell align="center">
+                {index === 0 ? (
+                  ""
+                ) : historyData[index - 1]?.balance > data.balance ? (
+                  <Typography color="red">Lost</Typography>
+                ) : (
+                  <Typography color="green">Won</Typography>
+                )}
+              </TableCell>
+              <TableCell align="center">{formatNumber(data.balance)}</TableCell>
+              <TableCell align="center">
+                {formatNumber(data.lowestBalance)}
+              </TableCell>
+              <TableCell align="center">{formatNumber(data.stake)}</TableCell>
+              <TableCell align="center">
+                {formatNumber(data.balance - budgetValue)}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
