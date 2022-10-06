@@ -14,6 +14,7 @@ type SimulationProviderProps = {
 
 type DataRow = {
   spin: number;
+  drawnNumber: { id: number; value: string; color: string };
   balance: number;
   lowestBalance: number;
   stake: number;
@@ -232,6 +233,7 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
         balance: currentBalance.current,
         lowestBalance: lowestBalance.current,
         stake: currentStake.current,
+        drawnNumber: { ...roulette[randomizedNumber] },
       },
     ]);
   };
@@ -265,6 +267,7 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
         balance: currentBalance.current,
         lowestBalance: lowestBalance.current,
         stake: currentStake.current,
+        drawnNumber: { id: 0, color: "N/A", value: "N/A" },
       },
     ]);
   };

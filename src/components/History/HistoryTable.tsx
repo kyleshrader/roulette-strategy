@@ -20,6 +20,7 @@ export default function HistoryTable() {
         <TableHead>
           <TableRow>
             <TableCell align="center">Spin #</TableCell>
+            <TableCell align="center">Drawn Number</TableCell>
             <TableCell />
             <TableCell align="center">Balance</TableCell>
             <TableCell align="center">Lowest balance</TableCell>
@@ -31,6 +32,15 @@ export default function HistoryTable() {
           {historyData?.map((data, index) => (
             <TableRow key={data.spin}>
               <TableCell align="center">{formatNumber(data.spin)}</TableCell>
+              <TableCell align="center">
+                {index === 0 ? (
+                  ""
+                ) : (
+                  <Typography color={data.drawnNumber.color}>
+                    {data.drawnNumber.value}
+                  </Typography>
+                )}
+              </TableCell>
               <TableCell align="center">
                 {index === 0 ? (
                   ""
