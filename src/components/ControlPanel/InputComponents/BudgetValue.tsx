@@ -3,11 +3,17 @@ import { useEffect } from "react";
 import { useSimulationContext } from "../../../context/SimulationContext";
 
 export default function BudgetValue() {
-  const { budgetValue, setBudgetValue, stakeValue, simulationRunning } =
-    useSimulationContext();
+  const {
+    budgetValue,
+    setBudgetValue,
+    stakeValue,
+    simulationRunning,
+    strategy,
+  } = useSimulationContext();
 
   useEffect(() => {
-    budgetValue < stakeValue ? setBudgetValue(stakeValue) : null;
+    if (strategy === "martingale")
+      budgetValue < stakeValue ? setBudgetValue(stakeValue) : null;
   }, [budgetValue, stakeValue]);
 
   return (

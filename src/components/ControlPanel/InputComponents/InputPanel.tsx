@@ -3,7 +3,7 @@ import { useSimulationContext } from "../../../context/SimulationContext";
 import BaseStake from "./BaseStake";
 import BudgetValue from "./BudgetValue";
 import CommonInputs from "./CommonInputs";
-import SpinTime from "./spinTime";
+import SpinTime from "./SpinTime";
 import WinningTarget from "./winningTarget";
 
 export default function InputPanel() {

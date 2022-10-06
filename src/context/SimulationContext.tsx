@@ -133,15 +133,6 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   }, [simulationRunning, simulationSpeed]);
 
   const runSimulation = () => {
-    setHistoryData((prevData) => [
-      ...prevData!,
-      {
-        spin: prevData!.length || 0,
-        balance: currentBalance.current,
-        lowestBalance: lowestBalance.current,
-        stake: currentStake.current,
-      },
-    ]);
     const roulette =
       rouletteType === "europeanRoulette" ? europeanRoulette : americanRoulette;
 
@@ -234,6 +225,15 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
       default:
         throw new Error("Strategy not recognized.");
     }
+    setHistoryData((prevData) => [
+      ...prevData!,
+      {
+        spin: prevData!.length || 0,
+        balance: currentBalance.current,
+        lowestBalance: lowestBalance.current,
+        stake: currentStake.current,
+      },
+    ]);
   };
 
   const startSimulation = () => {
@@ -259,6 +259,14 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
     }
     highestStake.current = currentStake.current;
     lowestBalance.current = budgetValue;
+    setHistoryData([
+      {
+        spin: 0,
+        balance: currentBalance.current,
+        lowestBalance: lowestBalance.current,
+        stake: currentStake.current,
+      },
+    ]);
   };
 
   const stopSimulation = () => {
