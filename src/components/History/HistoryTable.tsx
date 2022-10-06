@@ -6,11 +6,13 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Typography,
 } from "@mui/material";
 import { useSimulationContext } from "../../context/SimulationContext";
 
 export default function HistoryTable() {
   const { historyData, budgetValue } = useSimulationContext();
+
   return (
     <TableContainer component={Paper}>
       <Table size="small" aria-label="history-table">

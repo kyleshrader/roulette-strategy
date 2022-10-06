@@ -4,12 +4,19 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Button,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import HistoryTable from "./HistoryTable";
 import Graph from "./Graph";
+import { useState } from "react";
+import { useSimulationContext } from "../../context/SimulationContext";
 
 export default function History() {
+  const [showGraph, setShowGraph] = useState(false);
+  const [showTable, setShowTable] = useState(false);
+  const { historyData } = useSimulationContext();
+
   return (
     <Stack sx={{ my: 2 }}>
       <Accordion sx={{ p: 1 }}>
@@ -23,9 +30,36 @@ export default function History() {
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Stack gap={2} justifyContent="center" alignItems="center">
-            <Graph />
-            <HistoryTable />
+          <Stack
+            sx={{ mt: 2 }}
+            gap={2}
+            justifyContent="center"
+            alignItems="center"
+          >
+            {historyData ? (
+              <Stack direction="row" gap={1}>
+                <Button
+                  color="primary"
+                  variant={showGraph ? "outlined" : "contained"}
+                  onClick={() => setShowGraph(!showGraph)}
+                  size="small"
+                >
+                  {showGraph ? "Hide graph" : "Show graph"}
+                </Button>
+                <Button
+                  color="primary"
+                  variant={showTable ? "outlined" : "contained"}
+                  onClick={() => setShowTable(!showTable)}
+                  size="small"
+                >
+                  {showTable ? "Hide table" : "Show table"}
+                </Button>
+              </Stack>
+            ) : (
+              <Typography>No history to display. Run simulation.</Typography>
+            )}
+            {showGraph ? <Graph /> : null}
+            {showTable ? <HistoryTable /> : null}
           </Stack>
         </AccordionDetails>
       </Accordion>
