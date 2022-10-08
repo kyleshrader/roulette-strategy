@@ -1,10 +1,3 @@
-What was your motivation?
-Why did you build this project?
-What problem does it solve?
-What did you learn?
-What makes your project stand out?
-If your project has a lot of features, consider adding a "Features" section and listing them here.
-
 # Roulette Strategies Simulation
 
 This is the name of the project. It describes the whole project in one sentence, and helps people understand what the main goal and aim of the project is.
