@@ -20,14 +20,14 @@ Maybe later I could add possibility to create an account and save simulation his
 
 ## How to Install and Run the Project
 
-1.  Clone repository
-2.  "npm install"
-3.  "npm run dev"
-4.  Open http://127.0.0.1:5173/
+    1.  Clone repository
+    2.  "npm install"
+    3.  "npm run dev"
+    4.  Open http://127.0.0.1:5173/
 
 ## How to Use the Project
 
-    Simply run simulation with default values or adjust input values to fit your needs
+Simply run simulation with default values or adjust input values to fit your needs
 
 ### Credits
 
