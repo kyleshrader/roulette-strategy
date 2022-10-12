@@ -2,7 +2,7 @@ import { Box, Link, Typography } from "@mui/material";
 
 export default function Credits() {
   return (
-    <Box sx={{ position: "absolute", bottom: 0, right: 0 }}>
+    <Box sx={{ position: "absolute", top: 0, right: 0 }}>
       <Typography sx={{ m: 1 }} variant="caption">
         &#169; 2022 | Tomasz Marczak |
         <Link sx={{ ml: 1 }} href="https://github.com/TomaszMarczak">
