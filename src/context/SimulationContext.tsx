@@ -155,7 +155,7 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
       rouletteType === "europeanRoulette" ? europeanRoulette : americanRoulette;
 
     // stop conditions
-    if (stopLoss > 0 && budgetValue - currentBalance.current > stopLoss) {
+    if (stopLoss > 0 && budgetValue - currentBalance.current >= stopLoss) {
       // lost more than stopLoss
       setSimulationMessage({
         ...simulationMessage,
@@ -165,7 +165,7 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
       return;
     }
 
-    if (stopWin > 0 && currentBalance.current - budgetValue > stopWin) {
+    if (stopWin > 0 && currentBalance.current - budgetValue >= stopWin) {
       // won more than stopWin
       setSimulationMessage({
         ...simulationMessage,
