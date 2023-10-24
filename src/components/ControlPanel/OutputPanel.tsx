@@ -16,6 +16,7 @@ export default function OptionsPanel() {
     currentStake,
     highestStake,
     lowestBalance,
+    highestBalance,
     budgetValue,
     virtualTime,
     highestLosingStreak,
@@ -85,6 +86,25 @@ export default function OptionsPanel() {
           id="lowestBalance"
           label="Lowest balance"
           value={formatNumber(lowestBalance.current)}
+          variant="outlined"
+          InputProps={{
+            readOnly: true,
+            startAdornment: (
+              <InputAdornment
+                position="start"
+                disablePointerEvents
+                disableTypography
+              >
+                $
+              </InputAdornment>
+            ),
+          }}
+        /><TextField
+          sx={{ maxWidth: "15rem", minWidth: "8rem" }}
+          type="text"
+          id="highestBalance"
+          label="Highest balance"
+          value={formatNumber(highestBalance.current)}
           variant="outlined"
           InputProps={{
             readOnly: true,
@@ -179,7 +199,7 @@ export default function OptionsPanel() {
           label="Earnings / h"
           value={formatNumber(
             (currentBalance.current - budgetValue) /
-              (virtualTime.current / 3600000)
+            (virtualTime.current / 3600000)
           )}
           variant="outlined"
           InputProps={{

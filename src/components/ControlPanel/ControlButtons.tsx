@@ -72,7 +72,7 @@ export default function ControlButtons() {
             aria-label="simulationSpeed"
             value={1000 - simulationSpeed}
             min={0}
-            max={800}
+            max={980}
             onChange={(event, value) =>
               setSimulationSpeed(1000 - (value as number))
             }

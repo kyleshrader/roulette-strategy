@@ -11,11 +11,12 @@ import HistoryTable from "./HistoryTable";
 import Graph from "./Graph";
 import { useState } from "react";
 import { useSimulationContext } from "../../context/SimulationContext";
+import MultiResults from "./MultiResults";
 
 export default function History() {
   const [showGraph, setShowGraph] = useState(false);
   const [showTable, setShowTable] = useState(false);
-  const { historyData } = useSimulationContext();
+  const { historyData, simulationHistory } = useSimulationContext();
 
   return (
     <Stack sx={{ my: 2 }}>
@@ -58,6 +59,7 @@ export default function History() {
             ) : (
               <Typography>No history to display. Run simulation.</Typography>
             )}
+            {simulationHistory && simulationHistory.length > 1 ? (<MultiResults />) : null}
             {showGraph ? <Graph /> : null}
             {showTable ? <HistoryTable /> : null}
           </Stack>

@@ -24,6 +24,7 @@ export default function HistoryTable() {
             <TableCell />
             <TableCell align="center">Balance</TableCell>
             <TableCell align="center">Lowest balance</TableCell>
+            <TableCell align="center">Highest balance</TableCell>
             <TableCell align="center">Next stake</TableCell>
             <TableCell align="center">Earnings</TableCell>
           </TableRow>
@@ -53,6 +54,9 @@ export default function HistoryTable() {
               <TableCell align="center">{formatNumber(data.balance)}</TableCell>
               <TableCell align="center">
                 {formatNumber(data.lowestBalance)}
+              </TableCell>
+              <TableCell align="center">
+                {formatNumber(data.highestBalance)}
               </TableCell>
               <TableCell align="center">{formatNumber(data.stake)}</TableCell>
               <TableCell align="center">

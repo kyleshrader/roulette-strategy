@@ -5,6 +5,8 @@ import BudgetValue from "./BudgetValue";
 import CommonInputs from "./CommonInputs";
 import SpinTime from "./SpinTime";
 import WinningTarget from "./winningTarget";
+import BetWinnings from "./betWinnings";
+import StopInputs from "./stopInputs";
 
 export default function InputPanel() {
   const { strategy } = useSimulationContext();
@@ -26,7 +28,9 @@ export default function InputPanel() {
         {strategy === "martingale" && (
           <>
             <BudgetValue />
+            <BetWinnings />
             <BaseStake />
+            <StopInputs />
             <SpinTime />
           </>
         )}

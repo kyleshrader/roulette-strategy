@@ -17,6 +17,7 @@ type DataRow = {
   drawnNumber: { id: number; value: string; color: string };
   balance: number;
   lowestBalance: number;
+  highestBalance: number;
   stake: number;
 };
 
@@ -26,6 +27,9 @@ type SimulationContextTypes = {
   stakeValue: number;
   spinTime: number;
   simulationSpeed: number;
+  betWinnings: boolean;
+  stopLoss: number;
+  stopWin: number;
   rouletteType: string;
   spinNumber: number;
   strategy: string;
@@ -36,8 +40,10 @@ type SimulationContextTypes = {
   //OUTPUT
   currentBalance: { current: number };
   currentStake: { current: number };
+  currentBonusStake: { current: number };
   highestStake: { current: number };
   lowestBalance: { current: number };
+  highestBalance: { current: number };
   startTimeStamp: { current: number };
   simulationRunning: boolean;
   simulationMessage: {
@@ -56,6 +62,7 @@ type SimulationContextTypes = {
     };
   };
   historyData: DataRow[] | null;
+  simulationHistory: DataRow[][] | null;
 
   //INPUT
   setBudgetValue: (value: number) => void;
@@ -63,6 +70,9 @@ type SimulationContextTypes = {
   setSpinTime: (value: number) => void;
   setWinningTarget: (value: number) => void;
   setSimulationSpeed: (value: number) => void;
+  setBetWinnings: (value: boolean) => void;
+  setStopLoss: (value: number) => void;
+  setStopWin: (value: number) => void;
   setStrategy: (value: string) => void;
   setRouletteType: (value: string) => void;
   setTargetSequenceDiff: (value: number) => void;
@@ -74,6 +84,7 @@ type SimulationContextTypes = {
   runSimulation: () => void;
   setSimulationMessage: (value: { result: string; bettingOn: string }) => void;
   setHistoryData: (value: DataRow[]) => void;
+  setSimulationHistory: (value: DataRow[][]) => void;
 };
 
 const SimulationContext = createContext({} as SimulationContextTypes);
@@ -88,12 +99,15 @@ export const useSimulationContext = () => {
 
 export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   // INPUT VALUES
-  const [budgetValue, setBudgetValue] = useState(1500);
-  const [stakeValue, setStakeValue] = useState(50);
-  const [spinTime, setSpinTime] = useState(30);
-  const [simulationSpeed, setSimulationSpeed] = useState(400);
+  const [budgetValue, setBudgetValue] = useState(2000);
+  const [stakeValue, setStakeValue] = useState(5);
+  const [spinTime, setSpinTime] = useState(180);
+  const [simulationSpeed, setSimulationSpeed] = useState(980);
+  const [betWinnings, setBetWinnings] = useState(true);
+  const [stopLoss, setStopLoss] = useState(0);
+  const [stopWin, setStopWin] = useState(0);
   const [winningTarget, setWinningTarget] = useState(100);
-  const [rouletteType, setRouletteType] = useState("europeanRoulette");
+  const [rouletteType, setRouletteType] = useState("americanRoulette");
   const [strategy, setStrategy] = useState<string>("martingale");
   const sequence = useRef<number[]>([]);
 
@@ -101,8 +115,10 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   const [spinNumber, setSpinNumber] = useState(0);
   const currentBalance = useRef(0);
   const currentStake = useRef(0);
+  const currentBonusStake = useRef(0);
   const highestStake = useRef(0);
   const lowestBalance = useRef(0);
+  const highestBalance = useRef(0);
   const startTimeStamp = useRef(Date.now());
   const virtualTime = useRef(0);
   const highestLosingStreak = useRef(0);
@@ -114,6 +130,7 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   });
   const displayDrawnNumber = useRef({ id: 0, color: "green", value: "0" });
   const [historyData, setHistoryData] = useState<DataRow[] | null>(null);
+  const [simulationHistory, setSimulationHistory] = useState<DataRow[][] | null>([]);
 
   // HELPERS
   const initialSequence = useRef<number[]>([]);
@@ -137,11 +154,32 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
     const roulette =
       rouletteType === "europeanRoulette" ? europeanRoulette : americanRoulette;
 
+    // stop conditions
+    if (stopLoss > 0 && budgetValue - currentBalance.current > stopLoss) {
+      // lost more than stopLoss
+      setSimulationMessage({
+        ...simulationMessage,
+        result: "You've hit your stop loss...",
+      });
+      stopSimulation();
+      return;
+    }
+
+    if (stopWin > 0 && currentBalance.current - budgetValue > stopWin) {
+      // won more than stopWin
+      setSimulationMessage({
+        ...simulationMessage,
+        result: "You've hit your stop win...",
+      });
+      stopSimulation();
+      return;
+    }
+
     // losing condition
     if (currentBalance.current - currentStake.current < 0) {
       setSimulationMessage({
         ...simulationMessage,
-        result: "You've run out of money...",
+        result: "You can't afford your next bet...",
       });
       stopSimulation();
       return;
@@ -153,20 +191,24 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
     displayDrawnNumber.current = { ...roulette[randomizedNumber] };
     switch (strategy) {
       case "martingale":
+        const winnings = currentBalance.current - budgetValue;
+        currentBonusStake.current = winnings > 0 && betWinnings ? winnings : 0;
         // won spin
         if (bettingOn.current === roulette[randomizedNumber].color) {
           losingStreak = 0;
-          currentBalance.current += currentStake.current;
+          currentBalance.current += currentStake.current + currentBonusStake.current;
           currentStake.current = stakeValue;
           setSimulationMessage({
             ...simulationMessage,
             result: "Good! You are lucky",
           });
+          if (currentBalance.current > highestBalance.current)
+            highestBalance.current = currentBalance.current;
         }
         // lost spin
         if (bettingOn.current !== roulette[randomizedNumber].color) {
           losingStreak++;
-          currentBalance.current -= currentStake.current;
+          currentBalance.current -= currentStake.current + currentBonusStake.current;
           currentStake.current = currentStake.current * 2;
           setSimulationMessage({
             ...simulationMessage,
@@ -203,6 +245,9 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
             currentStake.current =
               sequence.current[0] +
               sequence.current[sequence.current.length - 1];
+
+          if (currentBalance.current > highestBalance.current)
+            highestBalance.current = currentBalance.current;
         }
         // lost spin
         if (bettingOn.current !== roulette[randomizedNumber].color) {
@@ -232,7 +277,8 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
         spin: prevData!.length || 0,
         balance: currentBalance.current,
         lowestBalance: lowestBalance.current,
-        stake: currentStake.current,
+        highestBalance: highestBalance.current,
+        stake: currentStake.current + currentBonusStake.current,
         drawnNumber: { ...roulette[randomizedNumber] },
       },
     ]);
@@ -261,11 +307,13 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
     }
     highestStake.current = currentStake.current;
     lowestBalance.current = budgetValue;
+    highestBalance.current = budgetValue;
     setHistoryData([
       {
         spin: 0,
         balance: currentBalance.current,
         lowestBalance: lowestBalance.current,
+        highestBalance: highestBalance.current,
         stake: currentStake.current,
         drawnNumber: { id: 0, color: "N/A", value: "N/A" },
       },
@@ -273,6 +321,16 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
   };
 
   const stopSimulation = () => {
+    let latestHistory: DataRow[] = []
+    setHistoryData(prevData => {
+      latestHistory = prevData || []
+      return prevData;
+    })
+    setSimulationHistory(prevData => {
+      const newData = [...prevData!, latestHistory]
+      console.log(newData)
+      return newData;
+    })
     sequence.current = Array.from(initialSequence.current); //returning to initial sequence
     clearInterval(intervalId);
     setSimulationRunning(false);
@@ -292,8 +350,10 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
         spinNumber,
         setSpinNumber,
         currentStake,
+        currentBonusStake,
         highestStake,
         lowestBalance,
+        highestBalance,
         simulationSpeed,
         setSimulationSpeed,
         startTimeStamp,
@@ -304,6 +364,12 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
         runSimulation,
         simulationMessage,
         setSimulationMessage,
+        betWinnings,
+        setBetWinnings,
+        stopLoss,
+        setStopLoss,
+        stopWin,
+        setStopWin,
         rouletteType,
         setRouletteType,
         virtualTime,
@@ -321,6 +387,8 @@ export const SimulationProvider = ({ children }: SimulationProviderProps) => {
         displayDrawnNumber,
         historyData,
         setHistoryData,
+        simulationHistory,
+        setSimulationHistory,
       }}
     >
       {children}

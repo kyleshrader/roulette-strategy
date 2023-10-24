@@ -2,7 +2,7 @@
   "name": "roulette-strategy",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://tomaszmarczak.github.io/roulette-strategy",
+  "homepage": "https://kyleshrader.github.io/roulette-strategy",
   "type": "module",
   "scripts": {
     "predeploy": "npm run build",

@@ -9,22 +9,36 @@ import {
   Tooltip,
 } from "recharts";
 import { useSimulationContext } from "../../context/SimulationContext";
+import { useEffect } from "react";
 
 export default function Graph() {
-  const { historyData } = useSimulationContext();
+  const { historyData, simulationHistory, simulationRunning } = useSimulationContext();
+  const data: typeof simulationHistory = []
+  if (simulationHistory) data.push(...simulationHistory)
+  if (simulationRunning && historyData) data.push(historyData)
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
+
   return (
     <Box height="100%" width="100%">
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={historyData!}>
-          <Line
-            isAnimationActive={false}
-            type="natural"
-            dataKey="balance"
-            stroke="#8884d8"
-            dot={false}
-          />
+        <LineChart>
+          {
+            data.flatMap((lineData, index) => (
+              <Line
+              key={index}
+              data={lineData}
+              isAnimationActive={false}
+              type="natural"
+              dataKey="balance"
+              dot={false}
+            />
+            ))
+          }
           <CartesianGrid stroke="#ccc" />
-          <XAxis dataKey="spin" minTickGap={20} />
+          <XAxis dataKey="spin" minTickGap={20} type="category" allowDuplicatedCategory={false} />
           <YAxis tickCount={5} />
           <Tooltip />
         </LineChart>
