@@ -16,7 +16,7 @@ export default function MultiResults() {
 
     return (
         <Box height="100%" width="100%">
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%">
                 <div>
                     <TextField
                         sx={{ maxWidth: "5rem", minWidth: "3rem" }}
